@@ -7,13 +7,33 @@ The files are stored and retrieved from the GCP bucket storage.
 
 This application exposes the following API endpoints: 
 
-1. `/upload` `POST` which takes file object.
+- Upload file
+ 
+API uri: `/upload` method: `POST` request: `file`
+
 
 Sample Response: 
 ```
 {
 "filename": "Project Specification_V2.0.pdf",
 "message": "File has been successfully uploaded"
+}
+```
+
+- Get all files
+ 
+API uri: `/files` method: `GET`
+
+Sample Response: 
+```
+{
+"files": [
+"A5_S20_5410.pdf",
+"Project Specification_V1.0.pdf",
+"Project Specification_V2.0.pdf",
+"lecture-16.pdf",
+"lecture-17.pdf"
+]
 }
 ```
  

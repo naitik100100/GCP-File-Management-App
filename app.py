@@ -21,6 +21,27 @@ def index():
 """
 
 
+@app.route('/files', methods=['GET'])
+def get_all_files():
+    try:
+        # Initializing GCP storage client
+        gcp_storage = storage.Client()
+
+        # Fetching the blobs object for the desired bucket
+        blobs = gcp_storage.list_blobs(CLOUD_STORAGE_BUCKET)
+
+        files = []
+        for blob in blobs:
+            files.append(blob.name)
+
+        app.logger.info("Files retrieved from the bucket: {} are: {}".format(CLOUD_STORAGE_BUCKET, files))
+        return jsonify(files=files)
+
+    except Exception as e:
+        app.logger.error(e)
+        return jsonify(message="An error occurred while uploading the file", error=str(e)), 409
+
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     selected_file = request.files.get('file')
@@ -60,7 +81,7 @@ def upload_file():
 @app.errorhandler(500)
 def server_error(e):
     app.logger.error('An error occurred during a request.')
-    return jsonify(message="An internal error occurred", error="{} See logs for full stacktrace.".format(e))\
+    return jsonify(message="An internal error occurred", error="{} See logs for full stacktrace.".format(e)) \
         , 500
 
 
