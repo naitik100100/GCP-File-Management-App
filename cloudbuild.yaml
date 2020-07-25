@@ -1,0 +1,12 @@
+steps:
+  # building the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/csci-5410-279515/user-file-upload", "."]
+
+  # pushing the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/csci-5410-279515/user-file-upload"]
+
+  # Deploying container image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ['beta', 'run', 'deploy', 'user-file-upload', '--image', 'gcr.io/csci-5410-279515/user-file-upload', '--region', 'us-central1', '--allow-unauthenticated', '--platform', 'managed']
