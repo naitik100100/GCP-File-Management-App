@@ -1,7 +1,8 @@
 import logging
 import os
+import tempfile
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from google.cloud import storage
 
 app = Flask(__name__)
@@ -19,6 +20,29 @@ def index():
     <input type="submit">
 </form>
 """
+
+
+@app.route('/file', methods=['GET'])
+def download_blob():
+
+    file_name = request.args.get('name')
+
+    if not file_name:
+        return jsonify(message="Filename cannot be empty"), 409
+
+    try:
+        gcp_storage = storage.Client()
+
+        bucket = gcp_storage.bucket(CLOUD_STORAGE_BUCKET)
+        blob = bucket.blob(file_name)
+
+        with tempfile.NamedTemporaryFile() as temp:
+            blob.download_to_filename(temp.name)
+            return send_file(temp.name, attachment_filename=file_name, as_attachment=True)
+
+    except Exception as e:
+        app.logger.error(e)
+        return jsonify(message="An error occurred while downloading the file", error=str(e)), 409
 
 
 @app.route('/files', methods=['GET'])

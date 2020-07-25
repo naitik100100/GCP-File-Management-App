@@ -7,7 +7,7 @@ The files are stored and retrieved from the GCP bucket storage.
 
 This application exposes the following API endpoints: 
 
-- Upload file
+- File upload
  
 API uri: `/upload` method: `POST` request: `file`
 
@@ -20,7 +20,7 @@ Sample Response:
 }
 ```
 
-- Get all files
+- Get all file names
  
 API uri: `/files` method: `GET`
 
@@ -36,6 +36,12 @@ Sample Response:
 ]
 }
 ```
+
+
+- File download
+ 
+API uri: `/file?name=file_name` method: `GET`
+
  
 ## Installation
 
