@@ -20,9 +20,9 @@ Sample Response:
 }
 ```
 
-- Get all file names
+- Get all user file names
  
-API uri: `/files` method: `GET`
+API uri: `/files/user` method: `GET`
 
 Sample Response: 
 ```
@@ -37,11 +37,32 @@ Sample Response:
 }
 ```
 
-
-- File download
+- Download user file
  
-API uri: `/file?name=file_name` method: `GET`
+API uri: `/file/user?name=file_name` method: `GET`
 
+
+- Get all chat file names
+ 
+API uri: `/files/chat` method: `GET`
+
+Sample Response: 
+```
+{
+"files": [
+"LMS_chat_session-27-4gOfjjIfokzc-.json",
+"LMS_chat_session-27-5yJM7lXLx9Y0-.json",
+"LMS_chat_session-27-JTtUDNzZOFF0-.json",
+"LMS_chat_session-27-W5te0j4Y2gGP-.json",
+"LMS_chat_session-27-e4kOydOsjmRq-.json",
+"LMS_chat_session-27-uV1zGw8Z4xCU-.json"
+]
+}
+```
+
+- Download chat file
+ 
+API uri: `/file/chat?name=file_name` method: `GET`
  
 ## Installation
 

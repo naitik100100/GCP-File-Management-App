@@ -9,7 +9,9 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 # Configure this environment variable
-CLOUD_STORAGE_BUCKET = os.environ.get('CLOUD_STORAGE_BUCKET')
+CLOUD_STORAGE_BUCKET = os.environ.get('CLOUD_STORAGE_BUCKET_USER')
+# Configure this environment variable
+CLOUD_STORAGE_BUCKET_CHAT = os.environ.get('CLOUD_STORAGE_BUCKET_CHAT')
 
 
 @app.route('/')
@@ -22,7 +24,53 @@ def index():
 """
 
 
-@app.route('/file', methods=['GET'])
+@app.route('/file/user', methods=['GET'])
+def download_user_file():
+
+    file_name = request.args.get('name')
+
+    if not file_name:
+        return jsonify(message="Filename cannot be empty"), 409
+
+    try:
+        gcp_storage = storage.Client()
+
+        bucket = gcp_storage.bucket(CLOUD_STORAGE_BUCKET)
+        blob = bucket.blob(file_name)
+
+        with tempfile.NamedTemporaryFile() as temp:
+            blob.download_to_filename(temp.name)
+            return send_file(temp.name, attachment_filename=file_name, as_attachment=True)
+
+    except Exception as e:
+        app.logger.error(e)
+        return jsonify(message="An error occurred while downloading the file", error=str(e)), 409
+
+
+@app.route('/file/chat', methods=['GET'])
+def download_chat_file():
+
+    file_name = request.args.get('name')
+
+    if not file_name:
+        return jsonify(message="Filename cannot be empty"), 409
+
+    try:
+        gcp_storage = storage.Client()
+
+        bucket = gcp_storage.bucket(CLOUD_STORAGE_BUCKET_CHAT)
+        blob = bucket.blob(file_name)
+
+        with tempfile.NamedTemporaryFile() as temp:
+            blob.download_to_filename(temp.name)
+            return send_file(temp.name, attachment_filename=file_name, as_attachment=True)
+
+    except Exception as e:
+        app.logger.error(e)
+        return jsonify(message="An error occurred while downloading the file", error=str(e)), 409
+
+
+@app.route('/file/user', methods=['GET'])
 def download_blob():
 
     file_name = request.args.get('name')
@@ -45,7 +93,7 @@ def download_blob():
         return jsonify(message="An error occurred while downloading the file", error=str(e)), 409
 
 
-@app.route('/files', methods=['GET'])
+@app.route('/files/user', methods=['GET'])
 def get_all_files():
     try:
         # Initializing GCP storage client
@@ -59,6 +107,27 @@ def get_all_files():
             files.append(blob.name)
 
         app.logger.info("Files retrieved from the bucket: {} are: {}".format(CLOUD_STORAGE_BUCKET, files))
+        return jsonify(files=files)
+
+    except Exception as e:
+        app.logger.error(e)
+        return jsonify(message="An error occurred while uploading the file", error=str(e)), 409
+
+
+@app.route('/files/chat', methods=['GET'])
+def get_chat_files():
+    try:
+        # Initializing GCP storage client
+        gcp_storage = storage.Client()
+
+        # Fetching the blobs object for the desired bucket
+        blobs = gcp_storage.list_blobs(CLOUD_STORAGE_BUCKET_CHAT)
+
+        files = []
+        for blob in blobs:
+            files.append(blob.name)
+
+        app.logger.info("Chat files retrieved from the bucket: {} are: {}".format(CLOUD_STORAGE_BUCKET_CHAT, files))
         return jsonify(files=files)
 
     except Exception as e:
